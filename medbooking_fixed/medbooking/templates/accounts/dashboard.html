@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard - MedBooking{% endblock %}
+{% block content %}
+<div class="container py-5">
+  <h2 class="mb-4"><i class="fas fa-tachometer-alt me-2 text-primary"></i>
+    Dashboard - {{ user.get_full_name|default:user.username }}
+    <span class="badge bg-{% if user.role == 'doctor' %}success{% elif user.role == 'admin' %}danger{% else %}primary{% endif %} fs-6">{{ user.get_role_display }}</span>
+  </h2>
+
+  {% if user.is_patient %}
+  <div class="row g-4 mb-4">
+    <div class="col-md-3"><div class="card stat-card p-3"><div class="d-flex justify-content-between align-items-center"><div><div class="text-muted small">Total RDV</div><div class="h3 fw-bold text-primary">{{ total }}</div></div><i class="fas fa-calendar-check fa-2x text-primary opacity-50"></i></div></div></div>
+    <div class="col-md-3"><div class="card stat-card success p-3"><div class="d-flex justify-content-between align-items-center"><div><div class="text-muted small">À venir / Upcoming</div><div class="h3 fw-bold text-success">{{ upcoming.count }}</div></div><i class="fas fa-clock fa-2x text-success opacity-50"></i></div></div></div>
+    <div class="col-md-3"><div class="card p-3 text-center"><a href="{% url 'doctor_list' %}" class="text-decoration-none"><i class="fas fa-search fa-2x text-primary mb-2"></i><div class="small fw-medium">Chercher Médecin<br>Find Doctor</div></a></div></div>
+    <div class="col-md-3"><div class="card p-3 text-center"><a href="{% url 'medical_history' %}" class="text-decoration-none"><i class="fas fa-history fa-2x text-info mb-2"></i><div class="small fw-medium">Historique médical<br>Medical History</div></a></div></div>
+  </div>
+  {% if upcoming %}
+  <div class="card mb-4"><div class="card-header bg-primary text-white"><i class="fas fa-calendar me-2"></i>Prochains rendez-vous / Upcoming Appointments</div>
+  <div class="card-body">
+    <div class="table-responsive">
+    <table class="table table-hover">
+      <thead><tr><th>Médecin / Doctor</th><th>Spécialité</th><th>Date</th><th>Heure</th><th>Statut</th><th>Actions</th></tr></thead>
+      <tbody>
+      {% for apt in upcoming %}
+      <tr>
+        <td>Dr. {{ apt.doctor.user.get_full_name }}</td>
+        <td>{{ apt.doctor.specialty.name_fr|default:"-" }}</td>
+        <td>{{ apt.date }}</td>
+        <td>{{ apt.start_time }}</td>
+        <td><span class="badge bg-{% if apt.status == 'confirmed' %}success{% elif apt.status == 'pending' %}warning text-dark{% else %}secondary{% endif %}">{{ apt.get_status_display }}</span></td>
+        <td>
+          <a href="{% url 'appointment_detail' apt.pk %}" class="btn btn-sm btn-outline-primary">Voir</a>
+          <a href="{% url 'cancel_appointment' apt.pk %}" class="btn btn-sm btn-outline-danger">Annuler</a>
+        </td>
+      </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+    </div>
+    <a href="{% url 'my_appointments' %}" class="btn btn-outline-primary btn-sm">Voir tout / See all</a>
+  </div></div>
+  {% endif %}
+
+  {% elif user.is_doctor %}
+  <div class="row g-4 mb-4">
+    <div class="col-md-3"><div class="card stat-card p-3"><div class="d-flex justify-content-between align-items-center"><div><div class="text-muted small">Patients total</div><div class="h3 fw-bold text-primary">{{ total_patients }}</div></div><i class="fas fa-users fa-2x text-primary opacity-50"></i></div></div></div>
+    <div class="col-md-3"><div class="card stat-card warning p-3"><div class="d-flex justify-content-between align-items-center"><div><div class="text-muted small">En attente / Pending</div><div class="h3 fw-bold text-warning">{{ pending_count }}</div></div><i class="fas fa-clock fa-2x text-warning opacity-50"></i></div></div></div>
+    <div class="col-md-3"><div class="card p-3 text-center"><a href="{% url 'doctor_my_profile' %}" class="text-decoration-none"><i class="fas fa-id-card fa-2x text-success mb-2"></i><div class="small fw-medium">Mon Profil<br>My Profile</div></a></div></div>
+    <div class="col-md-3"><div class="card p-3 text-center"><a href="{% url 'manage_availability' %}" class="text-decoration-none"><i class="fas fa-clock fa-2x text-info mb-2"></i><div class="small fw-medium">Disponibilités<br>Availability</div></a></div></div>
+  </div>
+  {% if today_appts %}
+  <div class="card mb-4"><div class="card-header bg-success text-white"><i class="fas fa-calendar-day me-2"></i>Mes Rendez-vous / My Appointments</div>
+  <div class="card-body"><div class="table-responsive">
+    <table class="table table-hover">
+      <thead><tr><th>Patient</th><th>Date</th><th>Heure</th><th>Type</th><th>Statut</th><th>Actions</th></tr></thead>
+      <tbody>
+      {% for apt in today_appts %}
+      <tr>
+        <td>{{ apt.patient.get_full_name }}</td>
+        <td>{{ apt.date }}</td>
+        <td>{{ apt.start_time }}</td>
+        <td>{{ apt.get_appointment_type_display }}</td>
+        <td><span class="badge bg-{% if apt.status == 'confirmed' %}success{% elif apt.status == 'pending' %}warning text-dark{% else %}secondary{% endif %}">{{ apt.get_status_display }}</span></td>
+        <td><a href="{% url 'appointment_detail' apt.pk %}" class="btn btn-sm btn-outline-primary">Gérer</a></td>
+      </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div></div></div>
+  {% endif %}
+
+  {% elif user.is_admin_user %}
+  <div class="row g-4 mb-4">
+    <div class="col-md-3"><div class="card stat-card p-3"><div class="d-flex justify-content-between align-items-center"><div><div class="text-muted small">Total Utilisateurs</div><div class="h3 fw-bold text-primary">{{ total_users }}</div></div><i class="fas fa-users fa-2x text-primary opacity-50"></i></div></div></div>
+    <div class="col-md-3"><div class="card stat-card success p-3"><div class="d-flex justify-content-between align-items-center"><div><div class="text-muted small">Médecins</div><div class="h3 fw-bold text-success">{{ total_doctors }}</div></div><i class="fas fa-user-md fa-2x text-success opacity-50"></i></div></div></div>
+    <div class="col-md-3"><div class="card stat-card warning p-3"><div class="d-flex justify-content-between align-items-center"><div><div class="text-muted small">Patients</div><div class="h3 fw-bold text-warning">{{ total_patients }}</div></div><i class="fas fa-user fa-2x text-warning opacity-50"></i></div></div></div>
+    <div class="col-md-3"><div class="card stat-card danger p-3"><div class="d-flex justify-content-between align-items-center"><div><div class="text-muted small">RDV Total</div><div class="h3 fw-bold text-danger">{{ total_appointments }}</div></div><i class="fas fa-calendar fa-2x text-danger opacity-50"></i></div></div></div>
+  </div>
+  <div class="row g-3 mb-4">
+    <div class="col-md-3"><a href="/admin/" class="text-decoration-none"><div class="card p-3 text-center"><i class="fas fa-cog fa-2x text-primary mb-2"></i><div class="small fw-medium">Admin Panel</div></div></a></div>
+    <div class="col-md-3"><a href="{% url 'my_appointments' %}" class="text-decoration-none"><div class="card p-3 text-center"><i class="fas fa-calendar fa-2x text-success mb-2"></i><div class="small fw-medium">Tous les RDV</div></div></a></div>
+    <div class="col-md-3"><a href="{% url 'doctor_list' %}" class="text-decoration-none"><div class="card p-3 text-center"><i class="fas fa-user-md fa-2x text-info mb-2"></i><div class="small fw-medium">Médecins</div></div></a></div>
+    <div class="col-md-3"><a href="{% url 'statistics' %}" class="text-decoration-none"><div class="card p-3 text-center"><i class="fas fa-chart-bar fa-2x text-warning mb-2"></i><div class="small fw-medium">Statistiques</div></div></a></div>
+  </div>
+  {% if recent_appointments %}
+  <div class="card"><div class="card-header bg-danger text-white"><i class="fas fa-list me-2"></i>Derniers Rendez-vous / Recent Appointments</div>
+  <div class="card-body"><div class="table-responsive">
+    <table class="table table-hover table-sm">
+      <thead><tr><th>Patient</th><th>Médecin</th><th>Date</th><th>Statut</th><th>Actions</th></tr></thead>
+      <tbody>
+      {% for apt in recent_appointments %}
+      <tr>
+        <td>{{ apt.patient.get_full_name }}</td>
+        <td>Dr. {{ apt.doctor.user.get_full_name }}</td>
+        <td>{{ apt.date }}</td>
+        <td><span class="badge bg-{% if apt.status == 'confirmed' %}success{% elif apt.status == 'pending' %}warning text-dark{% elif apt.status == 'cancelled' %}danger{% else %}secondary{% endif %}">{{ apt.get_status_display }}</span></td>
+        <td><a href="{% url 'appointment_detail' apt.pk %}" class="btn btn-sm btn-outline-primary">Voir</a></td>
+      </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div></div></div>
+  {% endif %}
+  {% endif %}
+</div>
+{% endblock %}

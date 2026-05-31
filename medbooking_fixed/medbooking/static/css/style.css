@@ -1,0 +1,32 @@
+:root {
+  --primary: #1a6fc4;
+  --primary-dark: #145499;
+  --secondary: #17a2b8;
+  --body-bg: #f0f4f8;
+  --card-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  --border-radius: 12px;
+}
+body { background: var(--body-bg); font-family: 'Segoe UI', system-ui, sans-serif; }
+.navbar { background: linear-gradient(135deg, #1a6fc4 0%, #145499 100%); box-shadow: 0 2px 15px rgba(26,111,196,0.3); }
+.navbar-brand { font-size: 1.5rem; font-weight: 700; }
+.navbar-brand span { color: #7dd3fc; }
+.card { border: none; border-radius: var(--border-radius); box-shadow: var(--card-shadow); transition: transform 0.2s, box-shadow 0.2s; }
+.card:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0,0,0,0.12); }
+.btn { border-radius: 8px; font-weight: 500; }
+.btn-primary { background: #1a6fc4; border-color: #1a6fc4; }
+.btn-primary:hover { background: #145499; border-color: #145499; }
+.stat-card { border-left: 4px solid #1a6fc4; }
+.stat-card.success { border-color: #28a745; }
+.stat-card.warning { border-color: #ffc107; }
+.stat-card.danger { border-color: #dc3545; }
+.doctor-card:hover { transform: translateY(-5px); box-shadow: 0 12px 35px rgba(0,0,0,0.15); }
+.doctor-avatar { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid #1a6fc4; }
+.doctor-avatar-placeholder { width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, #1a6fc4, #17a2b8); display: flex; align-items: center; justify-content: center; color: white; font-size: 1.8rem; font-weight: bold; }
+.star-rating { color: #ffc107; }
+.hero-section { background: linear-gradient(135deg, #1a6fc4 0%, #0ea5e9 50%, #17a2b8 100%); color: white; padding: 80px 0; }
+.sidebar { background: white; border-radius: var(--border-radius); box-shadow: var(--card-shadow); padding: 1.5rem; }
+.sidebar .nav-link { color: #495057; border-radius: 8px; margin-bottom: 4px; }
+.sidebar .nav-link:hover, .sidebar .nav-link.active { background: #1a6fc4; color: white; }
+.history-timeline { position: relative; padding-left: 30px; }
+.history-timeline::before { content: ''; position: absolute; left: 10px; top: 0; bottom: 0; width: 2px; background: #dee2e6; }
+footer { background: #1a1a2e; color: #adb5bd; margin-top: 60px; padding: 40px 0; }

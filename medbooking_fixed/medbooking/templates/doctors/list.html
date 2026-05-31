@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block title %}Médecins / Doctors - MedBooking{% endblock %}
+{% block content %}
+<div class="container py-5">
+  <h2 class="mb-4"><i class="fas fa-user-md me-2 text-primary"></i>Trouver un médecin / Find a Doctor</h2>
+  <div class="card mb-4 p-3">
+    <form method="get" class="row g-3">
+      <div class="col-md-4"><input type="text" name="q" value="{{ q }}" class="form-control" placeholder="Nom, spécialité / Name, specialty..."></div>
+      <div class="col-md-3"><select name="specialty" class="form-select"><option value="">Toutes spécialités / All</option>{% for s in specialties %}<option value="{{ s.id }}" {% if request.GET.specialty == s.id|stringformat:"i" %}selected{% endif %}>{{ s.name_fr }} / {{ s.name_en }}</option>{% endfor %}</select></div>
+      <div class="col-md-2"><input type="text" name="city" value="{{ request.GET.city }}" class="form-control" placeholder="Ville / City"></div>
+      <div class="col-md-1"><div class="form-check mt-2"><input class="form-check-input" type="checkbox" name="online" id="online" {% if request.GET.online %}checked{% endif %}><label class="form-check-label" for="online">Online</label></div></div>
+      <div class="col-md-2"><button type="submit" class="btn btn-primary w-100"><i class="fas fa-search me-1"></i>Rechercher</button></div>
+    </form>
+  </div>
+  <div class="row g-4">
+    {% for doctor in doctors %}
+    <div class="col-md-4">
+      <div class="card doctor-card h-100">
+        <div class="card-body text-center p-4">
+          {% if doctor.user.profile_pic %}<img src="{{ doctor.user.profile_pic.url }}" class="doctor-avatar mb-3" alt="">
+          {% else %}<div class="doctor-avatar-placeholder mx-auto mb-3">{{ doctor.user.first_name.0 }}{{ doctor.user.last_name.0 }}</div>{% endif %}
+          <h5 class="mb-1">Dr. {{ doctor.user.get_full_name }}</h5>
+          <p class="text-muted small mb-1">{% if doctor.specialty %}{{ doctor.specialty.name_fr }} / {{ doctor.specialty.name_en }}{% endif %}</p>
+          {% if doctor.city %}<p class="text-muted small mb-1"><i class="fas fa-map-marker-alt me-1"></i>{{ doctor.city }}</p>{% endif %}
+          <div class="star-rating mb-2">
+            {% for i in "12345" %}{% if forloop.counter <= doctor.rating|floatformat:"0"|add:"0" %}★{% else %}☆{% endif %}{% endfor %}
+            <small class="text-muted">({{ doctor.rating_count }})</small>
+          </div>
+          <div class="mb-3">
+            {% if doctor.is_available_online %}<span class="badge bg-success me-1"><i class="fas fa-video me-1"></i>Online</span>{% endif %}
+            {% if doctor.experience_years %}<span class="badge bg-light text-dark">{{ doctor.experience_years }} ans / years</span>{% endif %}
+          </div>
+          <a href="{% url 'doctor_detail' doctor.pk %}" class="btn btn-outline-primary btn-sm me-2">Voir profil</a>
+          {% if user.is_authenticated and user.is_patient %}<a href="{% url 'book_appointment' doctor.pk %}" class="btn btn-primary btn-sm">Réserver / Book</a>{% endif %}
+        </div>
+      </div>
+    </div>
+    {% empty %}
+    <div class="col-12 text-center py-5"><i class="fas fa-search fa-4x text-muted mb-3"></i><h4 class="text-muted">Aucun médecin trouvé / No doctors found</h4></div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

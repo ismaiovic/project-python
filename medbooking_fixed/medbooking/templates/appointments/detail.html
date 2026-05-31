@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block title %}Rendez-vous #{{ apt.pk }}{% endblock %}
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card p-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h4><i class="fas fa-calendar-alt me-2 text-primary"></i>Rendez-vous #{{ apt.pk }}</h4>
+          <span class="badge bg-{% if apt.status == 'confirmed' %}success{% elif apt.status == 'pending' %}warning text-dark{% elif apt.status == 'cancelled' %}danger{% elif apt.status == 'completed' %}info{% else %}secondary{% endif %} fs-6">{{ apt.get_status_display }}</span>
+        </div>
+        <div class="row g-3 mb-4">
+          <div class="col-md-6"><div class="p-3 bg-light rounded"><small class="text-muted d-block">Patient</small><strong>{{ apt.patient.get_full_name }}</strong></div></div>
+          <div class="col-md-6"><div class="p-3 bg-light rounded"><small class="text-muted d-block">Médecin / Doctor</small><strong>Dr. {{ apt.doctor.user.get_full_name }}</strong></div></div>
+          <div class="col-md-6"><div class="p-3 bg-light rounded"><small class="text-muted d-block">Date</small><strong>{{ apt.date }}</strong></div></div>
+          <div class="col-md-6"><div class="p-3 bg-light rounded"><small class="text-muted d-block">Heure / Time</small><strong>{{ apt.start_time }} - {{ apt.end_time }}</strong></div></div>
+          <div class="col-md-6"><div class="p-3 bg-light rounded"><small class="text-muted d-block">Type</small><strong>{{ apt.get_appointment_type_display }}</strong></div></div>
+          <div class="col-md-6"><div class="p-3 bg-light rounded"><small class="text-muted d-block">Créé le / Created</small><strong>{{ apt.created_at|date:"d/m/Y H:i" }}</strong></div></div>
+          {% if apt.reason %}<div class="col-12"><div class="p-3 bg-light rounded"><small class="text-muted d-block">Motif / Reason</small>{{ apt.reason }}</div></div>{% endif %}
+          {% if apt.notes %}<div class="col-12"><div class="p-3 bg-info bg-opacity-10 rounded"><small class="text-muted d-block"><i class="fas fa-notes-medical me-1"></i>Notes du médecin / Doctor Notes</small>{{ apt.notes }}</div></div>{% endif %}
+          {% if apt.cancel_reason %}<div class="col-12"><div class="p-3 bg-danger bg-opacity-10 rounded"><small class="text-muted d-block">Raison d'annulation / Cancel Reason</small>{{ apt.cancel_reason }}</div></div>{% endif %}
+        </div>
+        {% if update_form %}
+        <hr><h5>Mettre à jour / Update</h5>
+        <form method="post">{% csrf_token %}
+          {% for field in update_form %}<div class="mb-3"><label class="form-label fw-medium">{{ field.label }}</label>{{ field }}</div>{% endfor %}
+          <button type="submit" name="update" class="btn btn-success"><i class="fas fa-save me-2"></i>Sauvegarder</button>
+        </form>
+        {% endif %}
+        <div class="mt-3">
+          <a href="{% url 'my_appointments' %}" class="btn btn-secondary"><i class="fas fa-arrow-left me-1"></i>Retour / Back</a>
+          {% if apt.status in 'pending,confirmed' %}<a href="{% url 'cancel_appointment' apt.pk %}" class="btn btn-outline-danger ms-2">Annuler / Cancel</a>{% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

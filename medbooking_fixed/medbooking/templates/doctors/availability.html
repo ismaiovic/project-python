@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% block title %}Disponibilités / Availability{% endblock %}
+{% block content %}
+<div class="container py-5">
+  <div class="row g-4">
+    <div class="col-md-5">
+      <div class="card p-4">
+        <h5 class="mb-4"><i class="fas fa-plus me-2 text-primary"></i>Ajouter Disponibilité / Add Availability</h5>
+        <form method="post">{% csrf_token %}
+          {% for field in form %}<div class="mb-3"><label class="form-label fw-medium">{{ field.label }}</label>{{ field }}{% if field.errors %}<div class="text-danger small">{{ field.errors }}</div>{% endif %}</div>{% endfor %}
+          <button type="submit" class="btn btn-primary w-100"><i class="fas fa-plus me-2"></i>Ajouter / Add</button>
+        </form>
+      </div>
+    </div>
+    <div class="col-md-7">
+      <div class="card p-4">
+        <h5 class="mb-4"><i class="fas fa-calendar-week me-2 text-primary"></i>Mes Disponibilités / My Availability</h5>
+        {% for av in availabilities %}
+        <div class="d-flex justify-content-between align-items-center p-3 mb-2 rounded {% if av.is_active %}bg-light{% else %}bg-secondary bg-opacity-10{% endif %}">
+          <div>
+            <strong>{{ av.get_day_of_week_display }}</strong><br>
+            <small class="text-muted">{{ av.start_time }} - {{ av.end_time }} ({{ av.slot_duration }} min/slot)</small>
+          </div>
+          <div>
+            {% if av.is_active %}<span class="badge bg-success me-2">Actif / Active</span>{% else %}<span class="badge bg-secondary me-2">Inactif</span>{% endif %}
+            <a href="{% url 'delete_availability' av.pk %}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Supprimer?')"><i class="fas fa-trash"></i></a>
+          </div>
+        </div>
+        {% empty %}<p class="text-muted text-center">Aucune disponibilité / No availability added yet.</p>{% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

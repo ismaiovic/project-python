@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block title %}Notifications{% endblock %}
+{% block content %}
+<div class="container py-5">
+  <h2 class="mb-4"><i class="fas fa-bell me-2 text-primary"></i>Notifications</h2>
+  <div class="card"><div class="card-body">
+    {% for n in notifications %}
+    <div class="d-flex align-items-start p-3 mb-2 rounded {% if not n.is_read %}bg-light border-start border-primary border-3{% endif %}">
+      <div class="me-3 mt-1"><i class="fas fa-{% if 'confirmed' in n.notif_type %}check-circle text-success{% elif 'cancelled' in n.notif_type %}times-circle text-danger{% elif 'reminder' in n.notif_type %}clock text-warning{% else %}info-circle text-info{% endif %} fa-lg"></i></div>
+      <div class="flex-grow-1">
+        <p class="mb-1">{{ n.message }}</p>
+        <small class="text-muted">{{ n.created_at|date:"d/m/Y H:i" }}</small>
+      </div>
+      {% if n.appointment %}<a href="{% url 'appointment_detail' n.appointment.pk %}" class="btn btn-sm btn-outline-primary ms-2">Voir</a>{% endif %}
+    </div>
+    {% empty %}<div class="text-center py-5 text-muted"><i class="fas fa-bell-slash fa-3x mb-3 d-block"></i>Aucune notification / No notifications</div>
+    {% endfor %}
+  </div></div>
+</div>
+{% endblock %}

@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% block title %}Inscription / Register{% endblock %}
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-7">
+      <div class="card p-4">
+        <div class="text-center mb-4">
+          <i class="fas fa-user-plus fa-3x text-primary mb-2"></i>
+          <h3>Créer un compte / Create Account</h3>
+        </div>
+        <form method="post">{% csrf_token %}
+          <div class="row g-3">
+            {% for field in form %}
+              {% if field.name == 'admin_code' %}
+                <div class="col-md-6" id="admin-code-field" style="display:none;">
+                  <label class="form-label fw-medium">{{ field.label }}</label>
+                  {{ field }}
+                  {% if field.errors %}<div class="text-danger small mt-1">{{ field.errors }}</div>{% endif %}
+                  <div class="text-muted small mt-1"><i class="fas fa-lock me-1"></i>Code fourni par l'administrateur système.</div>
+                </div>
+              {% else %}
+                <div class="col-md-6">
+                  <label class="form-label fw-medium">{{ field.label }}</label>
+                  {{ field }}
+                  {% if field.errors %}<div class="text-danger small mt-1">{{ field.errors }}</div>{% endif %}
+                  {% if field.help_text %}<div class="text-muted small mt-1">{{ field.help_text }}</div>{% endif %}
+                </div>
+              {% endif %}
+            {% endfor %}
+          </div>
+          <div id="admin-warning" class="alert alert-warning mt-3" style="display:none;">
+            <i class="fas fa-shield-alt me-2"></i>
+            <strong>Compte Administrateur :</strong> Ce rôle donne un accès complet au système. Un code secret est requis.
+          </div>
+          <button type="submit" class="btn btn-primary w-100 py-2 mt-4">
+            <i class="fas fa-user-plus me-2"></i>S'inscrire / Register
+          </button>
+        </form>
+        <hr>
+        <p class="text-center mb-0">Déjà inscrit? <a href="{% url 'login' %}">Connexion / Login</a></p>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  const roleSelect = document.querySelector('select[name="role"]');
+  const adminCodeField = document.getElementById('admin-code-field');
+  const adminWarning = document.getElementById('admin-warning');
+  const adminInput = document.querySelector('input[name="admin_code"]');
+  function toggleAdminField() {
+    const isAdmin = roleSelect.value === 'admin';
+    adminCodeField.style.display = isAdmin ? 'block' : 'none';
+    adminWarning.style.display = isAdmin ? 'block' : 'none';
+    if (adminInput) adminInput.required = isAdmin;
+  }
+  if (roleSelect) {
+    roleSelect.addEventListener('change', toggleAdminField);
+    toggleAdminField();
+  }
+</script>
+{% endblock %}

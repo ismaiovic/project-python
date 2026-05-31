@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block title %}Historique médical / Medical History{% endblock %}
+{% block content %}
+<div class="container py-5">
+  <h2 class="mb-4"><i class="fas fa-history me-2 text-primary"></i>Historique médical / Medical History</h2>
+  {% if profile %}
+  <div class="card p-4 mb-4">
+    <h5><i class="fas fa-notes-medical me-2 text-primary"></i>Informations médicales / Medical Info</h5>
+    <div class="row g-3 mt-1">
+      {% if profile.blood_type %}<div class="col-md-3"><div class="p-2 bg-light rounded text-center"><small class="text-muted d-block">Groupe sanguin / Blood Type</small><strong class="text-danger">{{ profile.blood_type }}</strong></div></div>{% endif %}
+      {% if profile.date_of_birth %}<div class="col-md-3"><div class="p-2 bg-light rounded text-center"><small class="text-muted d-block">Date de naissance / DOB</small><strong>{{ profile.date_of_birth }}</strong></div></div>{% endif %}
+      {% if profile.allergies %}<div class="col-md-6"><div class="p-2 bg-light rounded"><small class="text-muted d-block">Allergies</small>{{ profile.allergies }}</div></div>{% endif %}
+    </div>
+  </div>
+  {% endif %}
+  <div class="history-timeline">
+    {% for apt in appointments %}
+    <div class="history-item">
+      <div class="card p-3">
+        <div class="d-flex justify-content-between align-items-start">
+          <div>
+            <strong>Dr. {{ apt.doctor.user.get_full_name }}</strong>
+            {% if apt.doctor.specialty %}<span class="text-muted"> — {{ apt.doctor.specialty.name_fr }}</span>{% endif %}
+          </div>
+          <small class="text-muted">{{ apt.date }}</small>
+        </div>
+        {% if apt.reason %}<p class="mb-1 small"><strong>Motif:</strong> {{ apt.reason }}</p>{% endif %}
+        {% if apt.notes %}<p class="mb-0 small text-muted"><strong>Notes:</strong> {{ apt.notes }}</p>{% endif %}
+      </div>
+    </div>
+    {% empty %}<div class="text-center py-5 text-muted"><i class="fas fa-notes-medical fa-3x mb-3 d-block"></i>Aucune consultation passée / No past consultations</div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

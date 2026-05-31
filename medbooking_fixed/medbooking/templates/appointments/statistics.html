@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block title %}Statistiques / Statistics{% endblock %}
+{% block content %}
+<div class="container py-5">
+  <h2 class="mb-4"><i class="fas fa-chart-bar me-2 text-primary"></i>Statistiques / Statistics</h2>
+  <div class="row g-4 mb-4">
+    <div class="col-md-3"><div class="card stat-card p-3 text-center"><div class="h2 fw-bold text-primary">{{ total }}</div><div class="text-muted small">Total RDV</div></div></div>
+    <div class="col-md-3"><div class="card stat-card success p-3 text-center"><div class="h2 fw-bold text-success">{{ completed }}</div><div class="text-muted small">Terminés / Completed</div></div></div>
+    <div class="col-md-3"><div class="card stat-card warning p-3 text-center"><div class="h2 fw-bold text-warning">{{ pending }}</div><div class="text-muted small">En attente / Pending</div></div></div>
+    <div class="col-md-3"><div class="card stat-card danger p-3 text-center"><div class="h2 fw-bold text-danger">{{ cancelled }}</div><div class="text-muted small">Annulés / Cancelled</div></div></div>
+  </div>
+  <div class="row g-4">
+    <div class="col-md-5"><div class="card p-4"><h5>Par statut / By Status</h5><canvas id="statusChart"></canvas></div></div>
+    <div class="col-md-7"><div class="card p-4"><h5>Par mois / By Month</h5><canvas id="monthChart"></canvas></div></div>
+  </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>
+const byStatus = {{ by_status|safe }};
+const byMonth = {{ by_month|safe }};
+const statusColors = {'pending':'#ffc107','confirmed':'#28a745','cancelled':'#dc3545','completed':'#17a2b8','no_show':'#6c757d'};
+new Chart(document.getElementById('statusChart'), {
+  type: 'doughnut',
+  data: {
+    labels: byStatus.map(d => d.status),
+    datasets: [{data: byStatus.map(d => d.count), backgroundColor: byStatus.map(d => statusColors[d.status]||'#ccc')}]
+  },
+  options: {plugins: {legend: {position: 'bottom'}}}
+});
+new Chart(document.getElementById('monthChart'), {
+  type: 'bar',
+  data: {
+    labels: byMonth.map(d => d.month||''),
+    datasets: [{label: 'RDV', data: byMonth.map(d => d.count), backgroundColor: '#1a6fc4', borderRadius: 6}]
+  },
+  options: {scales: {y: {beginAtZero: true}}}
+});
+</script>
+{% endblock %}

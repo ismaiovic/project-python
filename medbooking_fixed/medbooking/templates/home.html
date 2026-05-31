@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+{% block title %}MedBooking - Accueil / Home{% endblock %}
+{% block content %}
+<section class="hero-section">
+  <div class="container text-center">
+    <h1 class="display-4 fw-bold mb-3"><i class="fas fa-heartbeat me-3"></i>MedBooking</h1>
+    <p class="lead mb-4">Système de prise de rendez-vous médical en ligne<br><small>Smart Medical Appointment Management System</small></p>
+    <a href="{% url 'doctor_list' %}" class="btn btn-light btn-lg me-3"><i class="fas fa-search me-2"></i>Trouver un médecin / Find a Doctor</a>
+    {% if not user.is_authenticated %}
+    <a href="{% url 'register' %}" class="btn btn-outline-light btn-lg"><i class="fas fa-user-plus me-2"></i>S'inscrire / Register</a>
+    {% endif %}
+  </div>
+</section>
+
+<div class="container py-5">
+  <!-- Features -->
+  <div class="row g-4 mb-5">
+    <div class="col-md-4">
+      <div class="card h-100 text-center p-4">
+        <div class="display-4 text-primary mb-3"><i class="fas fa-calendar-check"></i></div>
+        <h5>Réservation facile / Easy Booking</h5>
+        <p class="text-muted small">Réservez votre rendez-vous en quelques clics / Book your appointment in a few clicks</p>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card h-100 text-center p-4">
+        <div class="display-4 text-success mb-3"><i class="fas fa-envelope"></i></div>
+        <h5>Confirmation email / Email Confirmation</h5>
+        <p class="text-muted small">Recevez une confirmation instantanée / Receive instant confirmation</p>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card h-100 text-center p-4">
+        <div class="display-4 text-info mb-3"><i class="fas fa-video"></i></div>
+        <h5>Consultation en ligne / Online Consultation</h5>
+        <p class="text-muted small">Consultez depuis chez vous / Consult from home</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Specialties -->
+  {% if specialties %}
+  <h3 class="mb-4"><i class="fas fa-stethoscope me-2 text-primary"></i>Spécialités / Specialties</h3>
+  <div class="row g-3 mb-5">
+    {% for s in specialties %}
+    <div class="col-6 col-md-3">
+      <a href="{% url 'doctor_list' %}?specialty={{ s.id }}" class="text-decoration-none">
+        <div class="card text-center p-3 h-100">
+          <i class="{{ s.icon }} fa-2x text-primary mb-2"></i>
+          <small class="fw-medium">{{ s.name_fr }}<br><span class="text-muted">{{ s.name_en }}</span></small>
+        </div>
+      </a>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <!-- Featured Doctors -->
+  {% if doctors %}
+  <h3 class="mb-4"><i class="fas fa-user-md me-2 text-primary"></i>Nos Médecins / Our Doctors</h3>
+  <div class="row g-4">
+    {% for doctor in doctors %}
+    <div class="col-md-4">
+      <div class="card doctor-card h-100">
+        <div class="card-body text-center p-4">
+          {% if doctor.user.profile_pic %}
+          <img src="{{ doctor.user.profile_pic.url }}" class="doctor-avatar mb-3" alt="">
+          {% else %}
+          <div class="doctor-avatar-placeholder mx-auto mb-3">{{ doctor.user.first_name.0 }}{{ doctor.user.last_name.0 }}</div>
+          {% endif %}
+          <h5 class="mb-1">Dr. {{ doctor.user.get_full_name }}</h5>
+          <p class="text-muted small mb-2">{% if doctor.specialty %}{{ doctor.specialty.name_fr }}{% endif %}</p>
+          <div class="star-rating mb-2">
+            {% for i in "12345" %}{% if forloop.counter <= doctor.rating|floatformat:"0"|add:"0" %}★{% else %}☆{% endif %}{% endfor %}
+            <small class="text-muted">({{ doctor.rating_count }})</small>
+          </div>
+          {% if doctor.is_available_online %}<span class="badge bg-success mb-2"><i class="fas fa-video me-1"></i>Online</span>{% endif %}
+          <br>
+          <a href="{% url 'doctor_detail' doctor.pk %}" class="btn btn-primary btn-sm mt-2">Voir profil / View Profile</a>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+</div>
+{% endblock %}
